@@ -42,8 +42,23 @@ namespace StudentAPI.Controllers
 
         // POST: api/Students
         [HttpPost]
-        public async Task<ActionResult<Student>> PostStudent(Student student)
+        public async Task<ActionResult<Student>> PostStudent(StudentPostModel studentDto)
         {
+            var student = new Student
+            {
+                Name = studentDto.Name,
+                SchoolName = studentDto.SchoolName,
+                ExamResult = studentDto.ExamResult != null ? new ExamResult
+                {
+                    English = studentDto.ExamResult.English,
+                    Telugu = studentDto.ExamResult.Telugu,
+                    Hindi = studentDto.ExamResult.Hindi,
+                    Mathematics = studentDto.ExamResult.Mathematics,
+                    Physics = studentDto.ExamResult.Physics,
+                    Social = studentDto.ExamResult.Social
+                } : null
+            };
+
             _context.Students.Add(student);
             await _context.SaveChangesAsync();
 
