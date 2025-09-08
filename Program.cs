@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using StudentAPI.Data;
+using Swashbuckle.AspNetCore.Filters;
+using StudentAPI.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +17,21 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Description = "Static token for authentication. Use this value: `my-secret-token`"
+    });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
+
+builder.Services.AddAuthentication("StaticToken")
+    .AddScheme<StaticTokenAuthenticationSchemeOptions, StaticTokenAuthenticationHandler>("StaticToken", null);
 
 var app = builder.Build();
 
@@ -26,6 +43,8 @@ if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Ena
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
