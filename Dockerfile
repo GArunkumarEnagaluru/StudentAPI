@@ -8,7 +8,7 @@ RUN dotnet restore
 
 # Copy the remaining source code
 COPY . .
-RUN dotnet publish -c Release -o out
+RUN dotnet publish StudentAPI.csproj -c Release -o out
 
 # Use the official ASP.NET Core runtime image for the final stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
